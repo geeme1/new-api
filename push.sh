@@ -44,6 +44,15 @@ git commit -m "$COMMIT_MSG"
 # 推送到 GitHub
 echo -e "${GREEN}3️⃣  推送到 ${REMOTE_URL}...${NC}"
 echo -e "${YELLOW}💡 提示：如果需要输入用户名和密码，请使用 GitHub Personal Access Token${NC}"
+
+# 先尝试拉取远程更改
+git pull origin main --rebase 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo -e "${YELLOW}⚠️  检测到远程仓库有新内容，正在合并...${NC}"
+    git pull origin main --rebase --allow-unrelated-histories
+fi
+
+# 推送
 git push origin main
 
 if [ $? -eq 0 ]; then
