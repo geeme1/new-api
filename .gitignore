@@ -27,3 +27,15 @@ data/
 .gomodcache/
 .gocache-temp
 .gopath
+
+# 额外排除
+*.zip
+*:Zone.Identifier
+web/node_modules/
+node_modules/
+.kiro/
+.codex/
+.shared/
+design-system/
+__pycache__/
+*.pyc
