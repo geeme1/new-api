@@ -179,10 +179,23 @@ func CheckUserExistOrDeleted(username string, email string) (bool, error) {
 	return true, nil
 }
 
+func getRawMaxUserId() (int, error) {
+	var maxID int
+	if err := DB.Unscoped().Model(&User{}).Select("COALESCE(MAX(id), 0)").Scan(&maxID).Error; err != nil {
+		return 0, err
+	}
+	return maxID, nil
+}
+
 func GetMaxUserId() int {
-	var user User
-	DB.Unscoped().Last(&user)
-	return user.Id
+	maxID, err := getRawMaxUserId()
+	if err != nil {
+		return common.UserIDStart - 1
+	}
+	if maxID < common.UserIDStart-1 {
+		return common.UserIDStart - 1
+	}
+	return maxID
 }
 
 func GetAllUsers(pageInfo *common.PageInfo) (users []*User, total int64, err error) {
@@ -379,6 +392,12 @@ func (user *User) Insert(inviterId int) error {
 		user.Password, err = common.Password2Hash(user.Password)
 		if err != nil {
 			return err
+		}
+	}
+	if common.UsingSQLite && user.Id == 0 {
+		maxID, err := getRawMaxUserId()
+		if err == nil && maxID < common.UserIDStart-1 {
+			user.Id = common.UserIDStart
 		}
 	}
 	user.Quota = common.QuotaForNewUser

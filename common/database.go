@@ -4,6 +4,7 @@ const (
 	DatabaseTypeMySQL      = "mysql"
 	DatabaseTypeSQLite     = "sqlite"
 	DatabaseTypePostgreSQL = "postgres"
+	UserIDStart            = 2002
 )
 
 var UsingSQLite = false
