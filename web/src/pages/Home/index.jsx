@@ -36,6 +36,7 @@ const Home = () => {
   const setTheme = useSetTheme();
   const siteUrl =
     typeof window !== 'undefined' ? window.location.origin : '';
+  const consoleTokenUrl = siteUrl ? `${siteUrl}/console/token` : '/console/token';
 
   const displayHomePageContent = async () => {
     setHomePageContent(localStorage.getItem('home_page_content') || '');
@@ -198,7 +199,7 @@ const Home = () => {
                           <button
                             onClick={() =>
                               window.open(
-                                'https://kfc-api.sxxe.net/console/token',
+                                consoleTokenUrl,
                                 '_blank',
                               )
                             }
