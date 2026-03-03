@@ -1034,6 +1034,192 @@ code {
   z-index: 1;
 }
 
+.home-guide-content {
+  margin-top: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ==================== Home: Guide Tabs ==================== */
+.home-guide-tabs {
+  margin-top: 8px;
+}
+
+.home-guide-tabs .semi-tabs-bar {
+  border-bottom: 1px solid rgba(86, 76, 64, 0.12);
+}
+
+.home-guide-section {
+  padding: 16px 0;
+}
+
+.home-guide-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--film-ink);
+  margin-bottom: 4px;
+}
+
+.home-guide-subtitle {
+  font-size: 14px;
+  color: rgba(62, 54, 44, 0.65);
+  margin-bottom: 16px;
+}
+
+.home-guide-os-tabs {
+  margin-top: 16px;
+}
+
+.home-guide-os-tabs .semi-tabs-bar {
+  margin-bottom: 16px;
+}
+
+.home-guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.home-guide-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-guide-step-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--film-ink);
+}
+
+.home-guide-step-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(62, 54, 44, 0.8);
+  margin-top: 8px;
+}
+
+.home-guide-step-desc {
+  font-size: 14px;
+  color: rgba(62, 54, 44, 0.7);
+}
+
+.home-guide-list {
+  list-style: disc;
+  padding-left: 20px;
+  font-size: 14px;
+  color: rgba(62, 54, 44, 0.75);
+  line-height: 1.8;
+}
+
+.home-guide-list li {
+  margin-bottom: 4px;
+}
+
+.home-guide-code-block {
+  position: relative;
+  background: rgba(30, 25, 20, 0.04);
+  border: 1px solid rgba(86, 76, 64, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.home-guide-code-block pre {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.home-guide-code-block code {
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  color: var(--film-ink);
+  white-space: pre;
+}
+
+.home-guide-code-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(62, 54, 44, 0.7);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(86, 76, 64, 0.15);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.home-guide-code-copy:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--film-ink);
+  border-color: rgba(86, 76, 64, 0.25);
+}
+
+.home-guide-placeholder {
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(62, 54, 44, 0.5);
+}
+
+/* Dark mode styles for guide */
+html.dark .home-guide-title {
+  color: #f6efe6;
+}
+
+html.dark .home-guide-subtitle {
+  color: rgba(214, 201, 183, 0.7);
+}
+
+html.dark .home-guide-step-title {
+  color: #f6efe6;
+}
+
+html.dark .home-guide-step-subtitle {
+  color: rgba(214, 201, 183, 0.85);
+}
+
+html.dark .home-guide-step-desc {
+  color: rgba(214, 201, 183, 0.75);
+}
+
+html.dark .home-guide-list {
+  color: rgba(214, 201, 183, 0.8);
+}
+
+html.dark .home-guide-tabs .semi-tabs-bar {
+  border-bottom-color: rgba(214, 201, 183, 0.15);
+}
+
+html.dark .home-guide-code-block {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(214, 201, 183, 0.12);
+}
+
+html.dark .home-guide-code-block code {
+  color: #f6efe6;
+}
+
+html.dark .home-guide-code-copy {
+  background: rgba(28, 22, 18, 0.8);
+  color: rgba(214, 201, 183, 0.8);
+  border-color: rgba(214, 201, 183, 0.2);
+}
+
+html.dark .home-guide-code-copy:hover {
+  background: rgba(38, 32, 28, 0.9);
+  color: #f6efe6;
+  border-color: rgba(214, 201, 183, 0.35);
+}
+
+html.dark .home-guide-placeholder {
+  color: rgba(214, 201, 183, 0.45);
+}
+
 @keyframes homePosterSweep {
   0% {
     background-position: 0% 50%;

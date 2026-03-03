@@ -24,6 +24,7 @@ import { useActualTheme, useSetTheme, useTheme } from '../../context/Theme';
 import { marked } from 'marked';
 import { useTranslation } from 'react-i18next';
 import NoticeModal from '../../components/layout/NoticeModal';
+import { Tabs, TabPane } from '@douyinfe/semi-ui';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
@@ -31,12 +32,23 @@ const Home = () => {
   const [homePageContentLoaded, setHomePageContentLoaded] = useState(false);
   const [homePageContent, setHomePageContent] = useState('');
   const [noticeVisible, setNoticeVisible] = useState(false);
+  const [guideTab, setGuideTab] = useState('codex');
+  const [osTab, setOsTab] = useState('windows');
   const isMobile = useIsMobile();
   const themeMode = useTheme();
   const setTheme = useSetTheme();
   const siteUrl =
     typeof window !== 'undefined' ? window.location.origin : '';
   const consoleTokenUrl = siteUrl ? `${siteUrl}/console/token` : '/console/token';
+
+  const handleCopyCode = async (code) => {
+    const ok = await copy(code);
+    if (ok) {
+      showSuccess(t('已复制到剪贴板'));
+    } else {
+      showError(t('复制失败'));
+    }
+  };
 
   const displayHomePageContent = async () => {
     setHomePageContent(localStorage.getItem('home_page_content') || '');
@@ -257,6 +269,379 @@ const Home = () => {
                           </svg>
                         </button>
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 接入指南区块 */}
+                <div className='home-access-grid' id='quick-start'>
+                  <div className='home-access-card home-access-card-guide'>
+                    <div className='home-access-header'>接入指南</div>
+                    <div className='home-guide-content'>
+                      <Tabs
+                        type='line'
+                        activeKey={guideTab}
+                        onChange={setGuideTab}
+                        className='home-guide-tabs'
+                      >
+                        <TabPane tab='Codex' itemKey='codex'>
+                          <div className='home-guide-section'>
+                            <div className='home-guide-title'>
+                              CodeX CLI 配置
+                            </div>
+                            <div className='home-guide-subtitle'>
+                              新一代 AI 命令行编程助手
+                            </div>
+
+                            <Tabs
+                              type='button'
+                              activeKey={osTab}
+                              onChange={setOsTab}
+                              className='home-guide-os-tabs'
+                            >
+                              <TabPane tab='Windows' itemKey='windows'>
+                                <div className='home-guide-steps'>
+                                  {/* 第一步 */}
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第一步：获取 API Token
+                                    </div>
+                                    <ul className='home-guide-list'>
+                                      <li>访问 Zer0by 控制台</li>
+                                      <li>创建新密钥，选择 CodeX 专用分组</li>
+                                      <li>复制生成的 API Key (注意：必须是 CodeX 专用分组令牌！)</li>
+                                    </ul>
+                                  </div>
+
+                                  {/* 第二步 */}
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第二步：创建配置
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      1. 创建目录 (CMD/PowerShell)：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode('mkdir %USERPROFILE%\\.codex\ncd %USERPROFILE%\\.codex')}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`mkdir %USERPROFILE%\\.codex
+cd %USERPROFILE%\\.codex`}</code></pre>
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      2. 创建 config.toml (使用 UTF-8 编码)：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`model_provider = "zer0by"
+model = "gpt-5.2"                      # 模型名称（代理支持的实际模型，别名或部署名）
+model_reasoning_effort = "medium"      # 推荐：medium（平衡速度与推理深度）
+                                       # 可选值：none（禁用推理，最快）、minimal、low、medium（默认推荐）、high、xhigh（最强推理，但更慢更贵）
+network_access = "enabled"             # 启用网络访问（工具调用等）
+disable_response_storage = true        # 禁用响应存储（隐私或轻量）
+
+# 模型提供者配置
+[model_providers.zer0by]
+name = "Zer0by Proxy"              # 显示名称（自定义）
+base_url = "${siteUrl}/v1"  # 代理基地址（OpenAI 兼容）
+wire_api = "responses"                 # 使用 Responses API（推荐 GPT-5 系列，支持高级 reasoning）
+requires_openai_auth = true            # 需要标准 OpenAI 风格的 API Key 认证`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`model_provider = "zer0by"
+model = "gpt-5.2"                      # 模型名称（代理支持的实际模型，别名或部署名）
+model_reasoning_effort = "medium"      # 推荐：medium（平衡速度与推理深度）
+                                       # 可选值：none（禁用推理，最快）、minimal、low、medium（默认推荐）、high、xhigh（最强推理，但更慢更贵）
+network_access = "enabled"             # 启用网络访问（工具调用等）
+disable_response_storage = true        # 禁用响应存储（隐私或轻量）
+
+# 模型提供者配置
+[model_providers.zer0by]
+name = "Zer0by Proxy"              # 显示名称（自定义）
+base_url = "${siteUrl}/v1"  # 代理基地址（OpenAI 兼容）
+wire_api = "responses"                 # 使用 Responses API（推荐 GPT-5 系列，支持高级 reasoning）
+requires_openai_auth = true            # 需要标准 OpenAI 风格的 API Key 认证`}</code></pre>
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      3. 创建 auth.json：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`{
+  "OPENAI_API_KEY": "粘贴为CodeX专用分组令牌key"
+}`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`{
+  "OPENAI_API_KEY": "粘贴为CodeX专用分组令牌key"
+}`}</code></pre>
+                                    </div>
+                                  </div>
+
+                                  {/* 第三步 */}
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第三步：启动
+                                    </div>
+                                    <div className='home-guide-step-desc'>
+                                      进入工程目录并运行：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`mkdir my-codex-project
+cd my-codex-project
+codex`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`mkdir my-codex-project
+cd my-codex-project
+codex`}</code></pre>
+                                    </div>
+                                  </div>
+                                </div>
+                              </TabPane>
+                              <TabPane tab='macOS' itemKey='macos'>
+                                <div className='home-guide-steps'>
+                                  {/* 第一步 */}
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第一步：获取 API Token
+                                    </div>
+                                    <ul className='home-guide-list'>
+                                      <li>访问 Zer0by 控制台</li>
+                                      <li>创建新密钥，选择 CodeX 专用分组</li>
+                                      <li>复制生成的 API Key (注意：必须是 CodeX 专用分组令牌！)</li>
+                                    </ul>
+                                  </div>
+
+                                  {/* 第二步 */}
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第二步：创建配置
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      1. 创建目录 (Terminal)：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode('mkdir -p ~/.codex\ncd ~/.codex')}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`mkdir -p ~/.codex
+cd ~/.codex`}</code></pre>
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      2. 创建 config.toml (使用 UTF-8 编码)：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`model_provider = "zer0by"
+model = "gpt-5.2"                      # 模型名称（代理支持的实际模型，别名或部署名）
+model_reasoning_effort = "medium"      # 推荐：medium（平衡速度与推理深度）
+                                       # 可选值：none（禁用推理，最快）、minimal、low、medium（默认推荐）、high、xhigh（最强推理，但更慢更贵）
+network_access = "enabled"             # 启用网络访问（工具调用等）
+disable_response_storage = true        # 禁用响应存储（隐私或轻量）
+
+# 模型提供者配置
+[model_providers.zer0by]
+name = "Zer0by Proxy"              # 显示名称（自定义）
+base_url = "${siteUrl}/v1"  # 代理基地址（OpenAI 兼容）
+wire_api = "responses"                 # 使用 Responses API（推荐 GPT-5 系列，支持高级 reasoning）
+requires_openai_auth = true            # 需要标准 OpenAI 风格的 API Key 认证`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`model_provider = "zer0by"
+model = "gpt-5.2"                      # 模型名称（代理支持的实际模型，别名或部署名）
+model_reasoning_effort = "medium"      # 推荐：medium（平衡速度与推理深度）
+                                       # 可选值：none（禁用推理，最快）、minimal、low、medium（默认推荐）、high、xhigh（最强推理，但更慢更贵）
+network_access = "enabled"             # 启用网络访问（工具调用等）
+disable_response_storage = true        # 禁用响应存储（隐私或轻量）
+
+# 模型提供者配置
+[model_providers.zer0by]
+name = "Zer0by Proxy"              # 显示名称（自定义）
+base_url = "${siteUrl}/v1"  # 代理基地址（OpenAI 兼容）
+wire_api = "responses"                 # 使用 Responses API（推荐 GPT-5 系列，支持高级 reasoning）
+requires_openai_auth = true            # 需要标准 OpenAI 风格的 API Key 认证`}</code></pre>
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      3. 创建 auth.json：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`{
+  "OPENAI_API_KEY": "粘贴为CodeX专用分组令牌key"
+}`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`{
+  "OPENAI_API_KEY": "粘贴为CodeX专用分组令牌key"
+}`}</code></pre>
+                                    </div>
+                                  </div>
+
+                                  {/* 第三步 */}
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第三步：启动
+                                    </div>
+                                    <div className='home-guide-step-desc'>
+                                      进入工程目录并运行：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`mkdir my-codex-project
+cd my-codex-project
+codex`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`mkdir my-codex-project
+cd my-codex-project
+codex`}</code></pre>
+                                    </div>
+                                  </div>
+                                </div>
+                              </TabPane>
+                              <TabPane tab='Linux' itemKey='linux'>
+                                <div className='home-guide-steps'>
+                                  {/* 第一步 */}
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第一步：获取 API Token
+                                    </div>
+                                    <ul className='home-guide-list'>
+                                      <li>访问 Zer0by 控制台</li>
+                                      <li>创建新密钥，选择 CodeX 专用分组</li>
+                                      <li>复制生成的 API Key (注意：必须是 CodeX 专用分组令牌！)</li>
+                                    </ul>
+                                  </div>
+
+                                  {/* 第二步 */}
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第二步：创建配置
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      1. 创建目录 (Terminal)：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode('mkdir -p ~/.codex\ncd ~/.codex')}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`mkdir -p ~/.codex
+cd ~/.codex`}</code></pre>
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      2. 创建 config.toml (使用 UTF-8 编码)：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`model_provider = "zer0by"
+model = "gpt-5.2"                      # 模型名称（代理支持的实际模型，别名或部署名）
+model_reasoning_effort = "medium"      # 推荐：medium（平衡速度与推理深度）
+                                       # 可选值：none（禁用推理，最快）、minimal、low、medium（默认推荐）、high、xhigh（最强推理，但更慢更贵）
+network_access = "enabled"             # 启用网络访问（工具调用等）
+disable_response_storage = true        # 禁用响应存储（隐私或轻量）
+
+# 模型提供者配置
+[model_providers.zer0by]
+name = "Zer0by Proxy"              # 显示名称（自定义）
+base_url = "${siteUrl}/v1"  # 代理基地址（OpenAI 兼容）
+wire_api = "responses"                 # 使用 Responses API（推荐 GPT-5 系列，支持高级 reasoning）
+requires_openai_auth = true            # 需要标准 OpenAI 风格的 API Key 认证`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`model_provider = "zer0by"
+model = "gpt-5.2"                      # 模型名称（代理支持的实际模型，别名或部署名）
+model_reasoning_effort = "medium"      # 推荐：medium（平衡速度与推理深度）
+                                       # 可选值：none（禁用推理，最快）、minimal、low、medium（默认推荐）、high、xhigh（最强推理，但更慢更贵）
+network_access = "enabled"             # 启用网络访问（工具调用等）
+disable_response_storage = true        # 禁用响应存储（隐私或轻量）
+
+# 模型提供者配置
+[model_providers.zer0by]
+name = "Zer0by Proxy"              # 显示名称（自定义）
+base_url = "${siteUrl}/v1"  # 代理基地址（OpenAI 兼容）
+wire_api = "responses"                 # 使用 Responses API（推荐 GPT-5 系列，支持高级 reasoning）
+requires_openai_auth = true            # 需要标准 OpenAI 风格的 API Key 认证`}</code></pre>
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      3. 创建 auth.json：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`{
+  "OPENAI_API_KEY": "粘贴为CodeX专用分组令牌key"
+}`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`{
+  "OPENAI_API_KEY": "粘贴为CodeX专用分组令牌key"
+}`}</code></pre>
+                                    </div>
+                                  </div>
+
+                                  {/* 第三步 */}
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第三步：启动
+                                    </div>
+                                    <div className='home-guide-step-desc'>
+                                      进入工程目录并运行：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`mkdir my-codex-project
+cd my-codex-project
+codex`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`mkdir my-codex-project
+cd my-codex-project
+codex`}</code></pre>
+                                    </div>
+                                  </div>
+                                </div>
+                              </TabPane>
+                            </Tabs>
+                          </div>
+                        </TabPane>
+                      </Tabs>
                     </div>
                   </div>
                 </div>
