@@ -77,12 +77,10 @@ func AddRedemption(c *gin.Context) {
 		common.ApiErrorI18n(c, i18n.MsgRedemptionCountMax)
 		return
 	}
-	useRandomQuota := redemption.MinQuota > 0 || redemption.MaxQuota > 0
-	if useRandomQuota {
-		if redemption.MinQuota <= 0 || redemption.MaxQuota <= 0 || redemption.MinQuota > redemption.MaxQuota {
-			common.ApiErrorI18n(c, i18n.MsgRedemptionQuotaRangeInvalid)
-			return
-		}
+	useRandomQuota, valid, msg := validateRedemptionRewardConfig(c, redemption)
+	if !valid {
+		common.ApiErrorMsg(c, msg)
+		return
 	}
 	if valid, msg := validateExpiredTime(c, redemption.ExpiredTime); !valid {
 		c.JSON(http.StatusOK, gin.H{"success": false, "message": msg})
@@ -104,8 +102,10 @@ func AddRedemption(c *gin.Context) {
 			UserId:      c.GetInt("id"),
 			Name:        redemption.Name,
 			Key:         key,
+			Status:      common.RedemptionCodeStatusEnabled,
 			CreatedTime: common.GetTimestamp(),
 			Quota:       quota,
+			PlanId:      redemption.PlanId,
 			ExpiredTime: redemption.ExpiredTime,
 		}
 		err = cleanRedemption.Insert()
@@ -156,6 +156,11 @@ func UpdateRedemption(c *gin.Context) {
 		return
 	}
 	if statusOnly == "" {
+		_, valid, msg := validateRedemptionRewardConfig(c, redemption)
+		if !valid {
+			common.ApiErrorMsg(c, msg)
+			return
+		}
 		if valid, msg := validateExpiredTime(c, redemption.ExpiredTime); !valid {
 			c.JSON(http.StatusOK, gin.H{"success": false, "message": msg})
 			return
@@ -163,6 +168,7 @@ func UpdateRedemption(c *gin.Context) {
 		// If you add more fields, please also update redemption.Update()
 		cleanRedemption.Name = redemption.Name
 		cleanRedemption.Quota = redemption.Quota
+		cleanRedemption.PlanId = redemption.PlanId
 		cleanRedemption.ExpiredTime = redemption.ExpiredTime
 	}
 	if statusOnly != "" {
@@ -200,4 +206,31 @@ func validateExpiredTime(c *gin.Context, expired int64) (bool, string) {
 		return false, i18n.T(c, i18n.MsgRedemptionExpireTimeInvalid)
 	}
 	return true, ""
+}
+
+func validateRedemptionRewardConfig(c *gin.Context, redemption model.Redemption) (bool, bool, string) {
+	planSelected := redemption.PlanId > 0
+	useRandomQuota := redemption.MinQuota > 0 || redemption.MaxQuota > 0
+
+	if planSelected {
+		if _, err := model.GetSubscriptionPlanById(redemption.PlanId); err != nil {
+			return false, false, "绑定的订阅套餐不存在"
+		}
+		if redemption.Quota > 0 || redemption.MinQuota > 0 || redemption.MaxQuota > 0 {
+			return false, false, "兑换码必须在额度和订阅套餐之间二选一"
+		}
+		return false, true, ""
+	}
+
+	if useRandomQuota {
+		if redemption.MinQuota <= 0 || redemption.MaxQuota <= 0 || redemption.MinQuota > redemption.MaxQuota {
+			return false, false, i18n.T(c, i18n.MsgRedemptionQuotaRangeInvalid)
+		}
+		return true, true, ""
+	}
+
+	if redemption.Quota <= 0 {
+		return false, false, "兑换码必须在额度和订阅套餐之间二选一"
+	}
+	return false, true, ""
 }

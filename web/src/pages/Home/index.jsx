@@ -151,7 +151,7 @@ const Home = () => {
                     <div className='home-poster-kicker'>PUBLIC BENEFIT</div>
                     <div className='home-poster-title'>
                       <span className='home-poster-title-sweep'>ZERO BY</span>
-                      <span className='home-poster-title-accent'>公益站</span>
+                      <span className='home-poster-title-accent'>Ai中转站</span>
                     </div>
                     <div className='home-poster-sub'>
                       COMMUNITY · STABILITY · SHARED ACCESS
@@ -165,7 +165,7 @@ const Home = () => {
                       <div className='relative z-10'>
                         <div className='flex justify-between items-start mb-6'>
                           <div className='inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold tracking-wide uppercase'>
-                            公益 · 稳定 · 共享
+                            AI · 稳定 · 共享
                           </div>
                           <button
                             onClick={cycleThemeMode}
@@ -191,13 +191,10 @@ const Home = () => {
                         </div>
 
                         <h1 className='text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight'>
-                          Zer0by <br />
-                          <span className='text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400'>
-                            公益站
-                          </span>
+                          Zer0by
                         </h1>
                         <p className='text-lg text-gray-500 dark:text-gray-400 max-w-xl mb-8 leading-relaxed'>
-                          Zer0by 公益站致力于为开发者与研究者提供稳定、低门槛的 API
+                          Zer0by Ai中转站致力于为开发者与研究者提供稳定、低门槛的 API
                           接入，聚合多家模型能力，保持清晰、可持续的服务体验。
                         </p>
 

@@ -879,19 +879,6 @@ code {
   grid-column: span 5;
 }
 
-.home-poster-left::before {
-  content: '';
-  position: absolute;
-  left: -28px;
-  top: 18px;
-  width: 6px;
-  height: 120px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #3b82f6, #6366f1, #1d4ed8);
-  box-shadow: 0 10px 24px rgba(59, 130, 246, 0.35);
-  opacity: 0.8;
-}
-
 .home-poster-left::after {
   content: 'ZER0BY';
   position: absolute;
@@ -1251,10 +1238,6 @@ html.dark .home-guide-placeholder {
   .home-poster-left {
     padding: 0 0 8px;
     text-align: left;
-  }
-
-  .home-poster-left::before {
-    left: 0;
   }
 
   .home-access-grid {

@@ -18,7 +18,8 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import React from 'react';
-import { Card, Avatar, Skeleton, Tag } from '@douyinfe/semi-ui';
+import { Info } from 'lucide-react';
+import { Card, Avatar, Skeleton, Tag, Tooltip } from '@douyinfe/semi-ui';
 import { VChart } from '@visactor/react-vchart';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -58,7 +59,16 @@ const StatsCards = ({
                       {item.icon}
                     </Avatar>
                     <div>
-                      <div className='text-xs text-gray-500'>{item.title}</div>
+                      <div className='text-xs text-gray-500 flex items-center gap-1'>
+                        <span>{item.title}</span>
+                        {item.hint ? (
+                          <Tooltip content={item.hint}>
+                            <span className='inline-flex items-center justify-center text-gray-400 cursor-help'>
+                              <Info size={12} />
+                            </span>
+                          </Tooltip>
+                        ) : null}
+                      </div>
                       <div className='text-lg font-semibold'>
                         <Skeleton
                           loading={loading}

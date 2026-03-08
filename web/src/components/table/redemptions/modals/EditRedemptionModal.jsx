@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   API,
@@ -55,6 +55,8 @@ const EditRedemptionModal = (props) => {
   const { t } = useTranslation();
   const isEdit = props.editingRedemption.id !== undefined;
   const [loading, setLoading] = useState(isEdit);
+  const [plansLoading, setPlansLoading] = useState(false);
+  const [plans, setPlans] = useState([]);
   const isMobile = useIsMobile();
   const formApiRef = useRef(null);
 
@@ -66,10 +68,48 @@ const EditRedemptionModal = (props) => {
     count: 1,
     expired_time: null,
     random_quota: false,
+    plan_id: undefined,
   });
 
   const handleCancel = () => {
     props.handleClose();
+  };
+
+  const planOptions = useMemo(
+    () =>
+      (plans || []).map((item) => ({
+        label: item?.plan?.title || `#${item?.plan?.id}`,
+        value: item?.plan?.id,
+      })),
+    [plans],
+  );
+
+  const planTitleMap = useMemo(() => {
+    const map = new Map();
+    (plans || []).forEach((item) => {
+      const id = item?.plan?.id;
+      if (id) {
+        map.set(id, item?.plan?.title || `#${id}`);
+      }
+    });
+    return map;
+  }, [plans]);
+
+  const loadPlans = async () => {
+    setPlansLoading(true);
+    try {
+      const res = await API.get('/api/subscription/admin/plans');
+      const { success, message, data } = res.data;
+      if (success) {
+        setPlans(data || []);
+      } else {
+        showError(message || t('加载失败'));
+      }
+    } catch (error) {
+      showError(t('请求失败'));
+    } finally {
+      setPlansLoading(false);
+    }
   };
 
   const loadRedemption = async () => {
@@ -90,6 +130,12 @@ const EditRedemptionModal = (props) => {
   };
 
   useEffect(() => {
+    if (props.visiable) {
+      loadPlans();
+    }
+  }, [props.visiable]);
+
+  useEffect(() => {
     if (formApiRef.current) {
       if (isEdit) {
         loadRedemption();
@@ -97,12 +143,19 @@ const EditRedemptionModal = (props) => {
         formApiRef.current.setValues(getInitValues());
       }
     }
-  }, [props.editingRedemption.id]);
+  }, [props.editingRedemption.id, isEdit]);
 
   const submit = async (values) => {
     let name = values.name;
+    const selectedPlanId = parseInt(values.plan_id, 10) || 0;
     if (!isEdit && (!name || name === '')) {
-      if (values.random_quota) {
+      if (selectedPlanId > 0) {
+        const defaultPlanName = planTitleMap.get(selectedPlanId) || '';
+        name =
+          defaultPlanName && defaultPlanName.length <= 20
+            ? defaultPlanName
+            : `套餐#${selectedPlanId}`;
+      } else if (values.random_quota) {
         name = `${renderQuota(values.min_quota)}-${renderQuota(values.max_quota)}`;
       } else {
         name = renderQuota(values.quota);
@@ -114,8 +167,14 @@ const EditRedemptionModal = (props) => {
     localInputs.quota = parseInt(localInputs.quota) || 0;
     localInputs.min_quota = parseInt(localInputs.min_quota) || 0;
     localInputs.max_quota = parseInt(localInputs.max_quota) || 0;
+    localInputs.plan_id = parseInt(localInputs.plan_id, 10) || 0;
     localInputs.random_quota = !!localInputs.random_quota;
-    if (!localInputs.random_quota) {
+    if (localInputs.plan_id > 0) {
+      localInputs.quota = 0;
+      localInputs.min_quota = 0;
+      localInputs.max_quota = 0;
+      localInputs.random_quota = false;
+    } else if (!localInputs.random_quota) {
       localInputs.min_quota = 0;
       localInputs.max_quota = 0;
     } else {
@@ -277,6 +336,19 @@ const EditRedemptionModal = (props) => {
                         showClear
                       />
                     </Col>
+                    <Col span={24}>
+                      <Form.Select
+                        field='plan_id'
+                        label={t('绑定订阅套餐')}
+                        placeholder={t('可选，选择后将作为套餐兑换码')}
+                        style={{ width: '100%' }}
+                        optionList={planOptions}
+                        loading={plansLoading}
+                        filter
+                        showClear
+                        extraText={t('方案B：额度和订阅套餐二选一；绑定套餐后将忽略额度设置')}
+                      />
+                    </Col>
                   </Row>
                 </Card>
 
@@ -309,7 +381,9 @@ const EditRedemptionModal = (props) => {
                         style={{ width: '100%' }}
                         type='number'
                         rules={
-                          values.random_quota
+                          values.plan_id
+                            ? []
+                            : values.random_quota
                             ? []
                             : [
                                 { required: true, message: t('请输入额度') },
@@ -326,7 +400,7 @@ const EditRedemptionModal = (props) => {
                         extraText={renderQuotaWithPrompt(
                           Number(values.quota) || 0,
                         )}
-                        disabled={values.random_quota}
+                        disabled={values.random_quota || Boolean(values.plan_id)}
                         data={[
                           { value: 500000, label: '1$' },
                           { value: 5000000, label: '10$' },
@@ -344,13 +418,18 @@ const EditRedemptionModal = (props) => {
                           field='random_quota'
                           label={t('随机额度')}
                           size='default'
-                          extraText={t('开启后将在范围内随机生成额度')}
+                          extraText={
+                            values.plan_id
+                              ? t('已绑定套餐时不可使用随机额度')
+                              : t('开启后将在范围内随机生成额度')
+                          }
+                          disabled={Boolean(values.plan_id)}
                         />
                       </Col>
                     )}
                   </Row>
 
-                  {!isEdit && values.random_quota && (
+                  {!isEdit && values.random_quota && !values.plan_id && (
                     <Row gutter={12}>
                       <Col span={12}>
                         <Form.InputNumber

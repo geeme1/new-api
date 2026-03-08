@@ -32,6 +32,13 @@ import {
 import { renderQuota } from '../../helpers';
 import { createSectionTitle } from '../../helpers/dashboard';
 
+const formatSubscriptionAmount = (amount, hasUnlimited, t) => {
+  if (hasUnlimited) {
+    return t('不限制');
+  }
+  return renderQuota(amount);
+};
+
 export const useDashboardStats = (
   userState,
   consumeQuota,
@@ -39,18 +46,48 @@ export const useDashboardStats = (
   times,
   trendData,
   performanceMetrics,
+  subscriptionSummary,
   navigate,
   t,
 ) => {
-  const groupedStatsData = useMemo(
-    () => [
+  const groupedStatsData = useMemo(() => {
+    const activeSubscriptions = subscriptionSummary?.activeSubscriptions || [];
+    const subscriptionStats = activeSubscriptions.reduce(
+      (acc, item) => {
+        const subscription = item?.subscription;
+        const totalAmount = Number(subscription?.amount_total || 0);
+        const usedAmount = Number(subscription?.amount_used || 0);
+
+        acc.activeCount += 1;
+        if (totalAmount <= 0) {
+          acc.hasUnlimited = true;
+        } else {
+          acc.totalAmount += totalAmount;
+          acc.remainingAmount += Math.max(0, totalAmount - usedAmount);
+        }
+        return acc;
+      },
+      {
+        activeCount: 0,
+        totalAmount: 0,
+        remainingAmount: 0,
+        hasUnlimited: false,
+      },
+    );
+
+    return [
       {
         title: createSectionTitle(Wallet, t('账户数据')),
         color: 'bg-blue-50',
         items: [
           {
             title: t('当前余额'),
-            value: renderQuota(userState?.user?.quota),
+            hint: t('已包含钱包余额和当前生效订阅剩余额度'),
+            value: formatSubscriptionAmount(
+              Number(userState?.user?.quota || 0) + subscriptionStats.remainingAmount,
+              subscriptionStats.hasUnlimited,
+              t,
+            ),
             icon: <IconMoneyExchangeStroked />,
             avatarColor: 'blue',
             trendData: [],
@@ -132,20 +169,20 @@ export const useDashboardStats = (
           },
         ],
       },
-    ],
-    [
-      userState?.user?.quota,
-      userState?.user?.used_quota,
-      userState?.user?.request_count,
-      times,
-      consumeQuota,
-      consumeTokens,
-      trendData,
-      performanceMetrics,
-      navigate,
-      t,
-    ],
-  );
+    ];
+  }, [
+    userState?.user?.quota,
+    userState?.user?.used_quota,
+    userState?.user?.request_count,
+    times,
+    consumeQuota,
+    consumeTokens,
+    trendData,
+    performanceMetrics,
+    subscriptionSummary,
+    navigate,
+    t,
+  ]);
 
   return {
     groupedStatsData,

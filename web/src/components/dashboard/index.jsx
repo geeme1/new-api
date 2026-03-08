@@ -81,6 +81,7 @@ const Dashboard = () => {
     dashboardData.times,
     dashboardData.trendData,
     dashboardData.performanceMetrics,
+    dashboardData.subscriptionSummary,
     dashboardData.navigate,
     dashboardData.t,
   );

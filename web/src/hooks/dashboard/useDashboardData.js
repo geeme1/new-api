@@ -60,6 +60,11 @@ export const useDashboardData = (userState, userDispatch, statusState) => {
   const [pieData, setPieData] = useState([{ type: 'null', value: '0' }]);
   const [lineData, setLineData] = useState([]);
   const [modelColors, setModelColors] = useState({});
+  const [subscriptionSummary, setSubscriptionSummary] = useState({
+    activeSubscriptions: [],
+    allSubscriptions: [],
+    billingPreference: 'subscription_first',
+  });
 
   // ========== 图表状态 ==========
   const [activeChartTab, setActiveChartTab] = useState('1');
@@ -223,11 +228,31 @@ export const useDashboardData = (userState, userDispatch, statusState) => {
     }
   }, [userDispatch]);
 
+  const getSubscriptionSummary = useCallback(async () => {
+    try {
+      const res = await API.get('/api/subscription/self');
+      if (res.data?.success) {
+        setSubscriptionSummary({
+          billingPreference:
+            res.data.data?.billing_preference || 'subscription_first',
+          activeSubscriptions: res.data.data?.subscriptions || [],
+          allSubscriptions: res.data.data?.all_subscriptions || [],
+        });
+      }
+    } catch (error) {
+      setSubscriptionSummary({
+        billingPreference: 'subscription_first',
+        activeSubscriptions: [],
+        allSubscriptions: [],
+      });
+    }
+  }, []);
+
   const refresh = useCallback(async () => {
     const data = await loadQuotaData();
-    await loadUptimeData();
+    await Promise.all([loadUptimeData(), getSubscriptionSummary()]);
     return data;
-  }, [loadQuotaData, loadUptimeData]);
+  }, [loadQuotaData, loadUptimeData, getSubscriptionSummary]);
 
   const handleSearchConfirm = useCallback(
     async (updateChartDataCallback) => {
@@ -251,6 +276,7 @@ export const useDashboardData = (userState, userDispatch, statusState) => {
   useEffect(() => {
     if (!initialized.current) {
       getUserData();
+      getSubscriptionSummary();
       initialized.current = true;
     }
   }, [getUserData]);
@@ -279,6 +305,7 @@ export const useDashboardData = (userState, userDispatch, statusState) => {
     setLineData,
     modelColors,
     setModelColors,
+    subscriptionSummary,
 
     // 图表状态
     activeChartTab,
