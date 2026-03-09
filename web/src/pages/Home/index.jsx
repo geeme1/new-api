@@ -34,6 +34,7 @@ const Home = () => {
   const [noticeVisible, setNoticeVisible] = useState(false);
   const [guideTab, setGuideTab] = useState('codex');
   const [osTab, setOsTab] = useState('windows');
+  const [openClawOsTab, setOpenClawOsTab] = useState('windows');
   const isMobile = useIsMobile();
   const themeMode = useTheme();
   const setTheme = useSetTheme();
@@ -631,6 +632,348 @@ codex`)}
                                       <pre><code>{`mkdir my-codex-project
 cd my-codex-project
 codex`}</code></pre>
+                                    </div>
+                                  </div>
+                                </div>
+                              </TabPane>
+                            </Tabs>
+                          </div>
+                        </TabPane>
+                        <TabPane tab='OpenClaw' itemKey='openclaw'>
+                          <div className='home-guide-section'>
+                            <div className='home-guide-title'>
+                              OpenClaw 配置
+                            </div>
+                            <div className='home-guide-subtitle'>
+                              使用 OpenAI Responses 接口接入 Zer0by
+                            </div>
+
+                            <Tabs
+                              type='button'
+                              activeKey={openClawOsTab}
+                              onChange={setOpenClawOsTab}
+                              className='home-guide-os-tabs'
+                            >
+                              <TabPane tab='Windows' itemKey='windows'>
+                                <div className='home-guide-steps'>
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第一步：获取 API Token
+                                    </div>
+                                    <ul className='home-guide-list'>
+                                      <li>访问 Zer0by 控制台</li>
+                                      <li>创建新密钥，选择可用模型对应分组</li>
+                                      <li>复制生成的 API Key</li>
+                                    </ul>
+                                  </div>
+
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第二步：修改配置文件
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      1. 确认配置目录存在 (PowerShell)：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode('mkdir $env:USERPROFILE\\.openclaw')}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`mkdir $env:USERPROFILE\\.openclaw`}</code></pre>
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      2. 打开 `%USERPROFILE%\\.openclaw\\openclaw.json`，在文件底部追加：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "codexpool": {
+        "baseUrl": "${siteUrl}/api/v1",
+        "apiKey": "粘贴你的 API Key",
+        "api": "openai-responses",
+        // 改成需要使用的模型 ID 和 Name
+        "models": [
+          { "id": "gpt-5.4", "name": "GPT-5.4" },
+          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      // 改成默认使用的模型别名
+      "models": {
+        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+      },
+      // 改成默认使用的主模型
+      "model": { "primary": "codexpool/gpt-5.4" }
+    }
+  }
+}`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "codexpool": {
+        "baseUrl": "${siteUrl}/api/v1",
+        "apiKey": "粘贴你的 API Key",
+        "api": "openai-responses",
+        // 改成需要使用的模型 ID 和 Name
+        "models": [
+          { "id": "gpt-5.4", "name": "GPT-5.4" },
+          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      // 改成默认使用的模型别名
+      "models": {
+        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+      },
+      // 改成默认使用的主模型
+      "model": { "primary": "codexpool/gpt-5.4" }
+    }
+  }
+}`}</code></pre>
+                                    </div>
+                                  </div>
+
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第三步：启动使用
+                                    </div>
+                                    <div className='home-guide-step-desc'>
+                                      保存配置后重新启动 OpenClaw，即可使用
+                                      `gpt-5.4` 作为默认模型。
+                                    </div>
+                                  </div>
+                                </div>
+                              </TabPane>
+                              <TabPane tab='macOS' itemKey='macos'>
+                                <div className='home-guide-steps'>
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第一步：获取 API Token
+                                    </div>
+                                    <ul className='home-guide-list'>
+                                      <li>访问 Zer0by 控制台</li>
+                                      <li>创建新密钥，选择可用模型对应分组</li>
+                                      <li>复制生成的 API Key</li>
+                                    </ul>
+                                  </div>
+
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第二步：修改配置文件
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      1. 确认配置目录存在 (Terminal)：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode('mkdir -p ~/.openclaw')}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`mkdir -p ~/.openclaw`}</code></pre>
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      2. 打开 `~/.openclaw/openclaw.json`，在文件底部追加：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "codexpool": {
+        "baseUrl": "${siteUrl}/api/v1",
+        "apiKey": "粘贴你的 API Key",
+        "api": "openai-responses",
+        // 改成需要使用的模型 ID 和 Name
+        "models": [
+          { "id": "gpt-5.4", "name": "GPT-5.4" },
+          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      // 改成默认使用的模型别名
+      "models": {
+        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+      },
+      // 改成默认使用的主模型
+      "model": { "primary": "codexpool/gpt-5.4" }
+    }
+  }
+}`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "codexpool": {
+        "baseUrl": "${siteUrl}/api/v1",
+        "apiKey": "粘贴你的 API Key",
+        "api": "openai-responses",
+        // 改成需要使用的模型 ID 和 Name
+        "models": [
+          { "id": "gpt-5.4", "name": "GPT-5.4" },
+          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      // 改成默认使用的模型别名
+      "models": {
+        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+      },
+      // 改成默认使用的主模型
+      "model": { "primary": "codexpool/gpt-5.4" }
+    }
+  }
+}`}</code></pre>
+                                    </div>
+                                  </div>
+
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第三步：启动使用
+                                    </div>
+                                    <div className='home-guide-step-desc'>
+                                      保存配置后重新启动 OpenClaw，即可使用
+                                      `gpt-5.4` 作为默认模型。
+                                    </div>
+                                  </div>
+                                </div>
+                              </TabPane>
+                              <TabPane tab='Linux' itemKey='linux'>
+                                <div className='home-guide-steps'>
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第一步：获取 API Token
+                                    </div>
+                                    <ul className='home-guide-list'>
+                                      <li>访问 Zer0by 控制台</li>
+                                      <li>创建新密钥，选择可用模型对应分组</li>
+                                      <li>复制生成的 API Key</li>
+                                    </ul>
+                                  </div>
+
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第二步：修改配置文件
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      1. 确认配置目录存在 (Terminal)：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode('mkdir -p ~/.openclaw')}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`mkdir -p ~/.openclaw`}</code></pre>
+                                    </div>
+
+                                    <div className='home-guide-step-subtitle'>
+                                      2. 打开 `~/.openclaw/openclaw.json`，在文件底部追加：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() => handleCopyCode(`{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "codexpool": {
+        "baseUrl": "${siteUrl}/api/v1",
+        "apiKey": "粘贴你的 API Key",
+        "api": "openai-responses",
+        // 改成需要使用的模型 ID 和 Name
+        "models": [
+          { "id": "gpt-5.4", "name": "GPT-5.4" },
+          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      // 改成默认使用的模型别名
+      "models": {
+        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+      },
+      // 改成默认使用的主模型
+      "model": { "primary": "codexpool/gpt-5.4" }
+    }
+  }
+}`)}
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "codexpool": {
+        "baseUrl": "${siteUrl}/api/v1",
+        "apiKey": "粘贴你的 API Key",
+        "api": "openai-responses",
+        // 改成需要使用的模型 ID 和 Name
+        "models": [
+          { "id": "gpt-5.4", "name": "GPT-5.4" },
+          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      // 改成默认使用的模型别名
+      "models": {
+        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+      },
+      // 改成默认使用的主模型
+      "model": { "primary": "codexpool/gpt-5.4" }
+    }
+  }
+}`}</code></pre>
+                                    </div>
+                                  </div>
+
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第三步：启动使用
+                                    </div>
+                                    <div className='home-guide-step-desc'>
+                                      保存配置后重新启动 OpenClaw，即可使用
+                                      `gpt-5.4` 作为默认模型。
                                     </div>
                                   </div>
                                 </div>
