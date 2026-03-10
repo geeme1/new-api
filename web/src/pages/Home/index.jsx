@@ -696,7 +696,7 @@ codex`}</code></pre>
     "mode": "merge",
     "providers": {
       "codexpool": {
-        "baseUrl": "${siteUrl}/api/v1",
+        "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
         "api": "openai-responses",
         // 改成需要使用的模型 ID 和 Name
@@ -726,7 +726,7 @@ codex`}</code></pre>
     "mode": "merge",
     "providers": {
       "codexpool": {
-        "baseUrl": "${siteUrl}/api/v1",
+        "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
         "api": "openai-responses",
         // 改成需要使用的模型 ID 和 Name
@@ -804,7 +804,7 @@ codex`}</code></pre>
     "mode": "merge",
     "providers": {
       "codexpool": {
-        "baseUrl": "${siteUrl}/api/v1",
+        "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
         "api": "openai-responses",
         // 改成需要使用的模型 ID 和 Name
@@ -834,7 +834,7 @@ codex`}</code></pre>
     "mode": "merge",
     "providers": {
       "codexpool": {
-        "baseUrl": "${siteUrl}/api/v1",
+        "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
         "api": "openai-responses",
         // 改成需要使用的模型 ID 和 Name
@@ -912,7 +912,7 @@ codex`}</code></pre>
     "mode": "merge",
     "providers": {
       "codexpool": {
-        "baseUrl": "${siteUrl}/api/v1",
+        "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
         "api": "openai-responses",
         // 改成需要使用的模型 ID 和 Name
@@ -942,7 +942,7 @@ codex`}</code></pre>
     "mode": "merge",
     "providers": {
       "codexpool": {
-        "baseUrl": "${siteUrl}/api/v1",
+        "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
         "api": "openai-responses",
         // 改成需要使用的模型 ID 和 Name
