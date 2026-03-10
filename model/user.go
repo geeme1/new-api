@@ -229,6 +229,8 @@ func GetAllUsers(pageInfo *common.PageInfo) (users []*User, total int64, err err
 		return nil, 0, err
 	}
 
+	applyPendingBatchUserStats(users)
+
 	return users, total, nil
 }
 
@@ -296,6 +298,8 @@ func SearchUsers(keyword string, group string, startIdx int, num int) ([]*User, 
 		return nil, 0, err
 	}
 
+	applyPendingBatchUserStats(users)
+
 	return users, total, nil
 }
 
@@ -310,7 +314,24 @@ func GetUserById(id int, selectAll bool) (*User, error) {
 	} else {
 		err = DB.Omit("password").First(&user, "id = ?", id).Error
 	}
+	if err == nil {
+		applyPendingBatchUserStats([]*User{&user})
+	}
 	return &user, err
+}
+
+func applyPendingBatchUserStats(users []*User) {
+	if !common.BatchUpdateEnabled || len(users) == 0 {
+		return
+	}
+	for _, user := range users {
+		if user == nil || user.Id == 0 {
+			continue
+		}
+		user.Quota += getPendingBatchValue(BatchUpdateTypeUserQuota, user.Id)
+		user.UsedQuota += getPendingBatchValue(BatchUpdateTypeUsedQuota, user.Id)
+		user.RequestCount += getPendingBatchValue(BatchUpdateTypeRequestCount, user.Id)
+	}
 }
 
 func GetUserIdByAffCode(affCode string) (int, error) {
