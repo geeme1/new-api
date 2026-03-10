@@ -171,12 +171,61 @@ type SubscriptionPlan struct {
 	// Total quota (amount in quota units, 0 = unlimited)
 	TotalAmount int64 `json:"total_amount" gorm:"type:bigint;not null;default:0"`
 
+	// Bound channel ids, comma separated. Empty means all channels.
+	ChannelIds string `json:"channel_ids" gorm:"type:text"`
+
 	// Quota reset period for plan
 	QuotaResetPeriod        string `json:"quota_reset_period" gorm:"type:varchar(16);default:'never'"`
 	QuotaResetCustomSeconds int64  `json:"quota_reset_custom_seconds" gorm:"type:bigint;default:0"`
 
 	CreatedAt int64 `json:"created_at" gorm:"bigint"`
 	UpdatedAt int64 `json:"updated_at" gorm:"bigint"`
+}
+
+func (p *SubscriptionPlan) GetChannelIDs() []int {
+	if p == nil || strings.TrimSpace(p.ChannelIds) == "" {
+		return nil
+	}
+	parts := strings.Split(p.ChannelIds, ",")
+	result := make([]int, 0, len(parts))
+	seen := make(map[int]struct{}, len(parts))
+	for _, part := range parts {
+		id, err := strconv.Atoi(strings.TrimSpace(part))
+		if err != nil || id <= 0 {
+			continue
+		}
+		if _, ok := seen[id]; ok {
+			continue
+		}
+		seen[id] = struct{}{}
+		result = append(result, id)
+	}
+	return result
+}
+
+func (p *SubscriptionPlan) MatchesAnyChannelIDs(channelIDs []int) bool {
+	if p == nil {
+		return false
+	}
+	planChannelIDs := p.GetChannelIDs()
+	if len(planChannelIDs) == 0 {
+		return true
+	}
+	if len(channelIDs) == 0 {
+		return false
+	}
+	allowed := make(map[int]struct{}, len(channelIDs))
+	for _, id := range channelIDs {
+		if id > 0 {
+			allowed[id] = struct{}{}
+		}
+	}
+	for _, id := range planChannelIDs {
+		if _, ok := allowed[id]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 func (p *SubscriptionPlan) BeforeCreate(tx *gorm.DB) error {
@@ -937,7 +986,7 @@ func maybeResetUserSubscriptionWithPlanTx(tx *gorm.DB, sub *UserSubscription, pl
 }
 
 // PreConsumeUserSubscription pre-consumes from any active subscription total quota.
-func PreConsumeUserSubscription(requestId string, userId int, modelName string, quotaType int, amount int64) (*SubscriptionPreConsumeResult, error) {
+func PreConsumeUserSubscription(requestId string, userId int, modelName string, quotaType int, amount int64, candidateChannelIDs []int) (*SubscriptionPreConsumeResult, error) {
 	if userId <= 0 {
 		return nil, errors.New("invalid userId")
 	}
@@ -988,6 +1037,9 @@ func PreConsumeUserSubscription(requestId string, userId int, modelName string, 
 			plan, err := getSubscriptionPlanByIdTx(tx, sub.PlanId)
 			if err != nil {
 				return err
+			}
+			if !plan.MatchesAnyChannelIDs(candidateChannelIDs) {
+				continue
 			}
 			if err := maybeResetUserSubscriptionWithPlanTx(tx, &sub, plan, now); err != nil {
 				return err

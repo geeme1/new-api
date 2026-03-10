@@ -100,7 +100,7 @@ func Distribute() func(c *gin.Context) {
 
 				if preferredChannelID, found := service.GetPreferredChannelByAffinity(c, modelRequest.Model, usingGroup); found {
 					preferred, err := model.CacheGetChannel(preferredChannelID)
-					if err == nil && preferred != nil && preferred.Status == common.ChannelStatusEnabled {
+					if err == nil && preferred != nil && preferred.Status == common.ChannelStatusEnabled && channelAllowedBySubscription(c, preferred.Id) {
 						if usingGroup == "auto" {
 							userGroup := common.GetContextKeyString(c, constant.ContextKeyUserGroup)
 							autoGroups := service.GetUserAutoGroup(userGroup)
@@ -156,6 +156,19 @@ func Distribute() func(c *gin.Context) {
 			service.RecordChannelAffinity(c, channel.Id)
 		}
 	}
+}
+
+func channelAllowedBySubscription(c *gin.Context, channelID int) bool {
+	allowedIDs, ok := common.GetContextKeyType[[]int](c, constant.ContextKeySubscriptionAllowedChannelIDs)
+	if !ok || len(allowedIDs) == 0 {
+		return true
+	}
+	for _, id := range allowedIDs {
+		if id == channelID {
+			return true
+		}
+	}
+	return false
 }
 
 // getModelFromRequest 从请求中读取模型信息

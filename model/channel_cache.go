@@ -94,9 +94,30 @@ func SyncChannelCache(frequency int) {
 }
 
 func GetRandomSatisfiedChannel(group string, model string, retry int) (*Channel, error) {
+	return getRandomSatisfiedChannelWithAllowed(group, model, retry, nil)
+}
+
+func GetRandomSatisfiedChannelWithAllowedIDs(group string, model string, retry int, allowedIDs []int) (*Channel, error) {
+	allowed := make(map[int]struct{}, len(allowedIDs))
+	for _, id := range allowedIDs {
+		if id > 0 {
+			allowed[id] = struct{}{}
+		}
+	}
+	return getRandomSatisfiedChannelWithAllowed(group, model, retry, allowed)
+}
+
+func getRandomSatisfiedChannelWithAllowed(group string, model string, retry int, allowed map[int]struct{}) (*Channel, error) {
 	// if memory cache is disabled, get channel directly from database
 	if !common.MemoryCacheEnabled {
-		return GetChannel(group, model, retry)
+		channel, err := GetChannelWithAllowedIDs(group, model, retry, mapKeys(allowed))
+		if err != nil || len(allowed) == 0 || channel == nil {
+			return channel, err
+		}
+		if _, ok := allowed[channel.Id]; ok {
+			return channel, nil
+		}
+		return nil, nil
 	}
 
 	channelSyncLock.RLock()
@@ -109,6 +130,20 @@ func GetRandomSatisfiedChannel(group string, model string, retry int) (*Channel,
 	if len(channels) == 0 {
 		normalizedModel := ratio_setting.FormatMatchingModelName(model)
 		channels = group2model2channels[group][normalizedModel]
+	}
+
+	if len(channels) == 0 {
+		return nil, nil
+	}
+
+	if len(allowed) > 0 {
+		filtered := make([]int, 0, len(channels))
+		for _, channelID := range channels {
+			if _, ok := allowed[channelID]; ok {
+				filtered = append(filtered, channelID)
+			}
+		}
+		channels = filtered
 	}
 
 	if len(channels) == 0 {
@@ -188,6 +223,17 @@ func GetRandomSatisfiedChannel(group string, model string, retry int) (*Channel,
 	}
 	// return null if no channel is not found
 	return nil, errors.New("channel not found")
+}
+
+func mapKeys(m map[int]struct{}) []int {
+	if len(m) == 0 {
+		return nil
+	}
+	result := make([]int, 0, len(m))
+	for id := range m {
+		result = append(result, id)
+	}
+	return result
 }
 
 func CacheGetChannel(id int) (*Channel, error) {

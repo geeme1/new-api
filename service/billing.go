@@ -3,9 +3,11 @@ package service
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/QuantumNous/new-api/common"
+	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/logger"
 	"github.com/QuantumNous/new-api/model"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
@@ -26,6 +28,7 @@ func PreConsumeBilling(c *gin.Context, preConsumedQuota int, relayInfo *relaycom
 	}
 
 	pref := common.NormalizeBillingPreference(relayInfo.UserSetting.BillingPreference)
+	candidateChannelIDs := getSubscriptionCandidateChannelIDs(c, relayInfo)
 	trySubscription := func() *types.NewAPIError {
 		quotaType := 0
 		// For total quota: consume preConsumedQuota quota units.
@@ -41,7 +44,7 @@ func PreConsumeBilling(c *gin.Context, preConsumedQuota int, relayInfo *relaycom
 			}
 		}
 
-		res, err := model.PreConsumeUserSubscription(relayInfo.RequestId, relayInfo.UserId, relayInfo.OriginModelName, quotaType, subConsume)
+		res, err := model.PreConsumeUserSubscription(relayInfo.RequestId, relayInfo.UserId, relayInfo.OriginModelName, quotaType, subConsume, candidateChannelIDs)
 		if err != nil {
 			// revert token pre-consume when subscription fails
 			if preConsumedQuota > 0 && !relayInfo.IsPlayground {
@@ -63,6 +66,9 @@ func PreConsumeBilling(c *gin.Context, preConsumedQuota int, relayInfo *relaycom
 		if planInfo, err := model.GetSubscriptionPlanInfoByUserSubscriptionId(res.UserSubscriptionId); err == nil && planInfo != nil {
 			relayInfo.SubscriptionPlanId = planInfo.PlanId
 			relayInfo.SubscriptionPlanTitle = planInfo.PlanTitle
+			if plan, err := model.GetSubscriptionPlanById(planInfo.PlanId); err == nil && plan != nil {
+				common.SetContextKey(c, constant.ContextKeySubscriptionAllowedChannelIDs, plan.GetChannelIDs())
+			}
 		}
 		relayInfo.FinalPreConsumedQuota = preConsumedQuota
 
@@ -74,6 +80,7 @@ func PreConsumeBilling(c *gin.Context, preConsumedQuota int, relayInfo *relaycom
 		relayInfo.BillingSource = BillingSourceWallet
 		relayInfo.SubscriptionId = 0
 		relayInfo.SubscriptionPreConsumed = 0
+		common.SetContextKey(c, constant.ContextKeySubscriptionAllowedChannelIDs, []int{})
 		return PreConsumeQuota(c, preConsumedQuota, relayInfo)
 	}
 
@@ -103,4 +110,30 @@ func PreConsumeBilling(c *gin.Context, preConsumedQuota int, relayInfo *relaycom
 		}
 		return nil
 	}
+}
+
+func getSubscriptionCandidateChannelIDs(c *gin.Context, relayInfo *relaycommon.RelayInfo) []int {
+	if c == nil || relayInfo == nil || relayInfo.OriginModelName == "" {
+		return nil
+	}
+	if specificChannel, ok := common.GetContextKey(c, constant.ContextKeyTokenSpecificChannelId); ok {
+		switch value := specificChannel.(type) {
+		case string:
+			if id, err := strconv.Atoi(value); err == nil && id > 0 {
+				return []int{id}
+			}
+		case int:
+			if value > 0 {
+				return []int{value}
+			}
+		}
+	}
+	usingGroup := common.GetContextKeyString(c, constant.ContextKeyUsingGroup)
+	if usingGroup == "" {
+		usingGroup = relayInfo.UsingGroup
+	}
+	if usingGroup == "auto" {
+		return model.GetEnabledChannelIDsForAnyGroupsModel(GetUserAutoGroup(relayInfo.UserGroup), relayInfo.OriginModelName)
+	}
+	return model.GetEnabledChannelIDsForGroupModel(usingGroup, relayInfo.OriginModelName)
 }

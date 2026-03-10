@@ -75,6 +75,8 @@ const AddEditSubscriptionModal = ({
   const [loading, setLoading] = useState(false);
   const [groupOptions, setGroupOptions] = useState([]);
   const [groupLoading, setGroupLoading] = useState(false);
+  const [channelOptions, setChannelOptions] = useState([]);
+  const [channelLoading, setChannelLoading] = useState(false);
   const isMobile = useIsMobile();
   const formApiRef = useRef(null);
   const isEdit = editingPlan?.plan?.id !== undefined;
@@ -94,6 +96,7 @@ const AddEditSubscriptionModal = ({
     sort_order: 0,
     max_purchase_per_user: 0,
     total_amount: 0,
+    channel_ids: [],
     upgrade_group: '',
     stripe_price_id: '',
     creem_product_id: '',
@@ -120,6 +123,10 @@ const AddEditSubscriptionModal = ({
       total_amount: Number(
         quotaToDisplayAmount(p.total_amount || 0).toFixed(2),
       ),
+      channel_ids: (p.channel_ids || '')
+        .split(',')
+        .map((id) => Number(id.trim()))
+        .filter((id) => Number.isInteger(id) && id > 0),
       upgrade_group: p.upgrade_group || '',
       stripe_price_id: p.stripe_price_id || '',
       creem_product_id: p.creem_product_id || '',
@@ -139,6 +146,27 @@ const AddEditSubscriptionModal = ({
       })
       .catch(() => setGroupOptions([]))
       .finally(() => setGroupLoading(false));
+  }, [visible]);
+
+  useEffect(() => {
+    if (!visible) return;
+    setChannelLoading(true);
+    API.get('/api/channel/?page_size=1000&id_sort=true')
+      .then((res) => {
+        if (res.data?.success) {
+          const items = res.data?.data?.items || [];
+          setChannelOptions(
+            items.map((item) => ({
+              value: item.id,
+              label: `#${item.id} ${item.name || 'Unnamed Channel'}`,
+            })),
+          );
+        } else {
+          setChannelOptions([]);
+        }
+      })
+      .catch(() => setChannelOptions([]))
+      .finally(() => setChannelLoading(false));
   }, [visible]);
 
   const submit = async (values) => {
@@ -163,6 +191,7 @@ const AddEditSubscriptionModal = ({
           sort_order: Number(values.sort_order || 0),
           max_purchase_per_user: Number(values.max_purchase_per_user || 0),
           total_amount: displayAmountToQuota(values.total_amount),
+          channel_ids: (values.channel_ids || []).join(','),
           upgrade_group: values.upgrade_group || '',
         },
       };
@@ -319,6 +348,22 @@ const AddEditSubscriptionModal = ({
                           values.total_amount,
                         )}`}
                         style={{ width: '100%' }}
+                      />
+                    </Col>
+
+                    <Col span={12}>
+                      <Form.Select
+                        field='channel_ids'
+                        label={t('订阅渠道绑定')}
+                        multiple
+                        filter
+                        showClear
+                        loading={channelLoading}
+                        placeholder={t('留空则全渠道可用')}
+                        extraText={t(
+                          '选择后，该订阅只会在这些渠道命中时抵扣；其他渠道将走普通余额额度。',
+                        )}
+                        optionList={channelOptions}
                       />
                     </Col>
 

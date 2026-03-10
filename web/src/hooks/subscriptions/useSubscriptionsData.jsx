@@ -28,6 +28,7 @@ export const useSubscriptionsData = () => {
 
   // State management
   const [allPlans, setAllPlans] = useState([]);
+  const [channelNameMap, setChannelNameMap] = useState({});
   const [loading, setLoading] = useState(true);
 
   // Pagination (client-side for now)
@@ -58,6 +59,23 @@ export const useSubscriptionsData = () => {
       showError(t('请求失败'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadChannels = async () => {
+    try {
+      const res = await API.get('/api/channel/?page_size=1000&id_sort=true');
+      if (res.data?.success) {
+        const items = res.data?.data?.items || [];
+        const nextMap = {};
+        items.forEach((item) => {
+          if (!item?.id) return;
+          nextMap[item.id] = item.name || `#${item.id}`;
+        });
+        setChannelNameMap(nextMap);
+      }
+    } catch (e) {
+      setChannelNameMap({});
     }
   };
 
@@ -121,6 +139,7 @@ export const useSubscriptionsData = () => {
   // Initialize data on component mount
   useEffect(() => {
     loadPlans();
+    loadChannels();
   }, []);
 
   const planCount = allPlans.length;
@@ -134,6 +153,7 @@ export const useSubscriptionsData = () => {
     plans,
     planCount,
     loading,
+    channelNameMap,
 
     // Modal state
     showEdit,

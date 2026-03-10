@@ -89,6 +89,10 @@ func getPriority(group string, model string, retry int) (int, error) {
 }
 
 func getChannelQuery(group string, model string, retry int) (*gorm.DB, error) {
+	return getChannelQueryWithAllowedIDs(group, model, retry, nil)
+}
+
+func getChannelQueryWithAllowedIDs(group string, model string, retry int, allowedIDs []int) (*gorm.DB, error) {
 	maxPrioritySubQuery := DB.Model(&Ability{}).Select("MAX(priority)").Where(commonGroupCol+" = ? and model = ? and enabled = ?", group, model, true)
 	channelQuery := DB.Where(commonGroupCol+" = ? and model = ? and enabled = ? and priority = (?)", group, model, true, maxPrioritySubQuery)
 	if retry != 0 {
@@ -99,15 +103,22 @@ func getChannelQuery(group string, model string, retry int) (*gorm.DB, error) {
 			channelQuery = DB.Where(commonGroupCol+" = ? and model = ? and enabled = ? and priority = ?", group, model, true, priority)
 		}
 	}
+	if len(allowedIDs) > 0 {
+		channelQuery = channelQuery.Where("channel_id IN ?", allowedIDs)
+	}
 
 	return channelQuery, nil
 }
 
 func GetChannel(group string, model string, retry int) (*Channel, error) {
+	return GetChannelWithAllowedIDs(group, model, retry, nil)
+}
+
+func GetChannelWithAllowedIDs(group string, model string, retry int, allowedIDs []int) (*Channel, error) {
 	var abilities []Ability
 
 	var err error = nil
-	channelQuery, err := getChannelQuery(group, model, retry)
+	channelQuery, err := getChannelQueryWithAllowedIDs(group, model, retry, allowedIDs)
 	if err != nil {
 		return nil, err
 	}

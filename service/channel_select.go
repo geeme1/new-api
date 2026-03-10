@@ -115,7 +115,7 @@ func CacheGetRandomSatisfiedChannel(param *RetryParam) (*model.Channel, string, 
 			}
 			logger.LogDebug(param.Ctx, "Auto selecting group: %s, priorityRetry: %d", autoGroup, priorityRetry)
 
-			channel, _ = model.GetRandomSatisfiedChannel(autoGroup, param.ModelName, priorityRetry)
+			channel, _ = getRandomSatisfiedChannelForContext(param.Ctx, autoGroup, param.ModelName, priorityRetry)
 			if channel == nil {
 				// Current group has no available channel for this model, try next group
 				// 当前分组没有该模型的可用渠道，尝试下一个分组
@@ -153,10 +153,18 @@ func CacheGetRandomSatisfiedChannel(param *RetryParam) (*model.Channel, string, 
 			break
 		}
 	} else {
-		channel, err = model.GetRandomSatisfiedChannel(param.TokenGroup, param.ModelName, param.GetRetry())
+		channel, err = getRandomSatisfiedChannelForContext(param.Ctx, param.TokenGroup, param.ModelName, param.GetRetry())
 		if err != nil {
 			return nil, param.TokenGroup, err
 		}
 	}
 	return channel, selectGroup, nil
+}
+
+func getRandomSatisfiedChannelForContext(c *gin.Context, group string, modelName string, retry int) (*model.Channel, error) {
+	allowedIDs, ok := common.GetContextKeyType[[]int](c, constant.ContextKeySubscriptionAllowedChannelIDs)
+	if !ok || len(allowedIDs) == 0 {
+		return model.GetRandomSatisfiedChannel(group, modelName, retry)
+	}
+	return model.GetRandomSatisfiedChannelWithAllowedIDs(group, modelName, retry, allowedIDs)
 }

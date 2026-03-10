@@ -34,6 +34,16 @@ import { convertUSDToCurrency } from '../../../helpers/render';
 
 const { Text } = Typography;
 
+function getSubscriptionChannelNames(plan, channelNameMap, t) {
+  const raw = plan?.channel_ids || '';
+  if (!raw) return [t('全渠道')];
+  return raw
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean)
+    .map((id) => channelNameMap?.[Number(id)] || `#${id}`);
+}
+
 function formatDuration(plan, t) {
   if (!plan) return '';
   const u = plan.duration_unit || 'month';
@@ -64,9 +74,10 @@ function formatResetPeriod(plan, t) {
   return t('不重置');
 }
 
-const renderPlanTitle = (text, record, t) => {
+const renderPlanTitle = (text, record, t, channelNameMap) => {
   const subtitle = record?.plan?.subtitle;
   const plan = record?.plan;
+  const channelNames = getSubscriptionChannelNames(plan, channelNameMap, t);
   const popoverContent = (
     <div style={{ width: 260 }}>
       <Text strong>{text}</Text>
@@ -91,6 +102,14 @@ const renderPlanTitle = (text, record, t) => {
         )}
         <Text type='tertiary'>{t('升级分组')}</Text>
         <Text>{plan?.upgrade_group ? plan.upgrade_group : t('不升级')}</Text>
+        <Text type='tertiary'>{t('订阅渠道')}</Text>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {channelNames.map((name) => (
+            <Tag key={name} size='small' shape='circle' color='white'>
+              {name}
+            </Tag>
+          ))}
+        </div>
         <Text type='tertiary'>{t('购买上限')}</Text>
         <Text>
           {plan?.max_purchase_per_user > 0
@@ -282,6 +301,7 @@ export const getSubscriptionsColumns = ({
   openEdit,
   setPlanEnabled,
   enableEpay,
+  channelNameMap,
 }) => {
   return [
     {
@@ -294,7 +314,8 @@ export const getSubscriptionsColumns = ({
       title: t('套餐'),
       dataIndex: ['plan', 'title'],
       width: 200,
-      render: (text, record) => renderPlanTitle(text, record, t),
+      render: (text, record) =>
+        renderPlanTitle(text, record, t, channelNameMap),
     },
     {
       title: t('价格'),
