@@ -523,7 +523,7 @@ codex`}</code></pre>
                                   </div>
                                 </div>
                               </TabPane>
-                              <TabPane tab='Linux' itemKey='linux'>
+                              <TabPane tab='Linux (WSL)' itemKey='linux'>
                                 <div className='home-guide-steps'>
                                   {/* 第一步 */}
                                   <div className='home-guide-step'>
@@ -645,7 +645,7 @@ codex`}</code></pre>
                               OpenClaw 配置
                             </div>
                             <div className='home-guide-subtitle'>
-                              使用 OpenAI Responses 接口接入 Zer0by
+                              我们一起养龙虾~
                             </div>
 
                             <Tabs
@@ -662,7 +662,7 @@ codex`}</code></pre>
                                     </div>
                                     <ul className='home-guide-list'>
                                       <li>访问 Zer0by 控制台</li>
-                                      <li>创建新密钥，选择可用模型对应分组</li>
+                                      <li>令牌管理创建密钥，选择对应模型分组</li>
                                       <li>复制生成的 API Key</li>
                                     </ul>
                                   </div>
@@ -695,11 +695,12 @@ codex`}</code></pre>
   "models": {
     "mode": "merge",
     "providers": {
-      "codexpool": {
+      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
+      "zeroby": {
         "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
-        "api": "openai-responses",
-        // 改成需要使用的模型 ID 和 Name
+        "api": "openai-completions",
+        // 模型名称与 ID 保持一致，名称可在模型广场查看
         "models": [
           { "id": "gpt-5.4", "name": "GPT-5.4" },
           { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
@@ -711,10 +712,10 @@ codex`}</code></pre>
     "defaults": {
       // 改成默认使用的模型别名
       "models": {
-        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
       },
       // 改成默认使用的主模型
-      "model": { "primary": "codexpool/gpt-5.4" }
+      "model": { "primary": "zeroby/gpt-5.4" }
     }
   }
 }`)}
@@ -725,11 +726,12 @@ codex`}</code></pre>
   "models": {
     "mode": "merge",
     "providers": {
-      "codexpool": {
+      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
+      "zeroby": {
         "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
-        "api": "openai-responses",
-        // 改成需要使用的模型 ID 和 Name
+        "api": "openai-completions",
+        // 模型名称与 ID 保持一致，名称可在模型广场查看
         "models": [
           { "id": "gpt-5.4", "name": "GPT-5.4" },
           { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
@@ -741,10 +743,10 @@ codex`}</code></pre>
     "defaults": {
       // 改成默认使用的模型别名
       "models": {
-        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
       },
       // 改成默认使用的主模型
-      "model": { "primary": "codexpool/gpt-5.4" }
+      "model": { "primary": "zeroby/gpt-5.4" }
     }
   }
 }`}</code></pre>
@@ -770,7 +772,7 @@ codex`}</code></pre>
                                     </div>
                                     <ul className='home-guide-list'>
                                       <li>访问 Zer0by 控制台</li>
-                                      <li>创建新密钥，选择可用模型对应分组</li>
+                                      <li>令牌管理创建密钥，选择对应模型分组</li>
                                       <li>复制生成的 API Key</li>
                                     </ul>
                                   </div>
@@ -803,11 +805,12 @@ codex`}</code></pre>
   "models": {
     "mode": "merge",
     "providers": {
-      "codexpool": {
+      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
+      "zeroby": {
         "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
-        "api": "openai-responses",
-        // 改成需要使用的模型 ID 和 Name
+        "api": "openai-completions",
+        // 模型名称与 ID 保持一致，名称可在模型广场查看
         "models": [
           { "id": "gpt-5.4", "name": "GPT-5.4" },
           { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
@@ -819,10 +822,10 @@ codex`}</code></pre>
     "defaults": {
       // 改成默认使用的模型别名
       "models": {
-        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
       },
       // 改成默认使用的主模型
-      "model": { "primary": "codexpool/gpt-5.4" }
+      "model": { "primary": "zeroby/gpt-5.4" }
     }
   }
 }`)}
@@ -833,11 +836,12 @@ codex`}</code></pre>
   "models": {
     "mode": "merge",
     "providers": {
-      "codexpool": {
+      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
+      "zeroby": {
         "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
-        "api": "openai-responses",
-        // 改成需要使用的模型 ID 和 Name
+        "api": "openai-completions",
+        // 模型名称与 ID 保持一致，名称可在模型广场查看
         "models": [
           { "id": "gpt-5.4", "name": "GPT-5.4" },
           { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
@@ -849,10 +853,10 @@ codex`}</code></pre>
     "defaults": {
       // 改成默认使用的模型别名
       "models": {
-        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
       },
       // 改成默认使用的主模型
-      "model": { "primary": "codexpool/gpt-5.4" }
+      "model": { "primary": "zeroby/gpt-5.4" }
     }
   }
 }`}</code></pre>
@@ -870,7 +874,7 @@ codex`}</code></pre>
                                   </div>
                                 </div>
                               </TabPane>
-                              <TabPane tab='Linux' itemKey='linux'>
+                              <TabPane tab='Linux (WSL)' itemKey='linux'>
                                 <div className='home-guide-steps'>
                                   <div className='home-guide-step'>
                                     <div className='home-guide-step-title'>
@@ -878,14 +882,36 @@ codex`}</code></pre>
                                     </div>
                                     <ul className='home-guide-list'>
                                       <li>访问 Zer0by 控制台</li>
-                                      <li>创建新密钥，选择可用模型对应分组</li>
+                                      <li>令牌管理创建密钥，选择对应模型分组</li>
                                       <li>复制生成的 API Key</li>
                                     </ul>
                                   </div>
 
                                   <div className='home-guide-step'>
                                     <div className='home-guide-step-title'>
-                                      第二步：修改配置文件
+                                      第二步（方法一）：一键添加自定义模型（推荐）
+                                    </div>
+                                    <div className='home-guide-step-subtitle'>
+                                      1. 使用脚本快速写入 OpenClaw 配置：
+                                    </div>
+                                    <div className='home-guide-code-block'>
+                                      <button
+                                        className='home-guide-code-copy'
+                                        onClick={() =>
+                                          handleCopyCode(
+                                            'bash <(curl -sL kejilion.sh) app openclaw',
+                                          )
+                                        }
+                                      >
+                                        复制
+                                      </button>
+                                      <pre><code>{`bash <(curl -sL kejilion.sh) app openclaw`}</code></pre>
+                                    </div>
+                                  </div>
+
+                                  <div className='home-guide-step'>
+                                    <div className='home-guide-step-title'>
+                                      第二步（方法二）：手动修改配置文件
                                     </div>
 
                                     <div className='home-guide-step-subtitle'>
@@ -911,11 +937,12 @@ codex`}</code></pre>
   "models": {
     "mode": "merge",
     "providers": {
-      "codexpool": {
+      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
+      "zeroby": {
         "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
-        "api": "openai-responses",
-        // 改成需要使用的模型 ID 和 Name
+        "api": "openai-completions",
+        // 模型名称与 ID 保持一致，名称可在模型广场查看
         "models": [
           { "id": "gpt-5.4", "name": "GPT-5.4" },
           { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
@@ -927,10 +954,10 @@ codex`}</code></pre>
     "defaults": {
       // 改成默认使用的模型别名
       "models": {
-        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
       },
       // 改成默认使用的主模型
-      "model": { "primary": "codexpool/gpt-5.4" }
+      "model": { "primary": "zeroby/gpt-5.4" }
     }
   }
 }`)}
@@ -941,11 +968,12 @@ codex`}</code></pre>
   "models": {
     "mode": "merge",
     "providers": {
-      "codexpool": {
+      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
+      "zeroby": {
         "baseUrl": "${siteUrl}/v1",
         "apiKey": "粘贴你的 API Key",
-        "api": "openai-responses",
-        // 改成需要使用的模型 ID 和 Name
+        "api": "openai-completions",
+        // 模型名称与 ID 保持一致，名称可在模型广场查看
         "models": [
           { "id": "gpt-5.4", "name": "GPT-5.4" },
           { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
@@ -957,10 +985,10 @@ codex`}</code></pre>
     "defaults": {
       // 改成默认使用的模型别名
       "models": {
-        "codexpool/gpt-5.4": { "alias": "gpt-5.4" }
+        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
       },
       // 改成默认使用的主模型
-      "model": { "primary": "codexpool/gpt-5.4" }
+      "model": { "primary": "zeroby/gpt-5.4" }
     }
   }
 }`}</code></pre>

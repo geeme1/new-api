@@ -70,28 +70,38 @@ export function getFooterHTML() {
 }
 
 export async function copy(text) {
-  let okay = true;
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch (e) {
+  const value = typeof text === 'string' ? text : String(text ?? '');
+  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
     try {
-      // 构建 textarea 执行复制命令，保留多行文本格式
-      const textarea = window.document.createElement('textarea');
-      textarea.value = text;
-      textarea.setAttribute('readonly', '');
-      textarea.style.position = 'fixed';
-      textarea.style.left = '-9999px';
-      textarea.style.top = '-9999px';
-      window.document.body.appendChild(textarea);
-      textarea.select();
-      window.document.execCommand('copy');
-      window.document.body.removeChild(textarea);
+      if (window.isSecureContext) {
+        await navigator.clipboard.writeText(value);
+        return true;
+      }
     } catch (e) {
-      okay = false;
-      console.error(e);
+      // Fall back to execCommand below
     }
   }
-  return okay;
+
+  try {
+    // 构建 textarea 执行复制命令，保留多行文本格式
+    const textarea = window.document.createElement('textarea');
+    textarea.value = value;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    textarea.style.top = '-9999px';
+    textarea.style.opacity = '0';
+    window.document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
+    const ok = window.document.execCommand('copy');
+    window.document.body.removeChild(textarea);
+    return ok;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 }
 
 // isMobile 函数已移除，请改用 useIsMobile Hook
