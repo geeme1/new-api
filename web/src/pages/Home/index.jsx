@@ -34,6 +34,7 @@ const Home = () => {
   const [noticeVisible, setNoticeVisible] = useState(false);
   const [guideTab, setGuideTab] = useState('codex');
   const [osTab, setOsTab] = useState('windows');
+  const [openClawMethodTab, setOpenClawMethodTab] = useState('method1');
   const [openClawOsTab, setOpenClawOsTab] = useState('windows');
   const isMobile = useIsMobile();
   const themeMode = useTheme();
@@ -82,7 +83,7 @@ const Home = () => {
 
   const handleCopyEndpoint = async () => {
     if (!siteUrl) return;
-    const ok = await copy(siteUrl);
+    const ok = await copy(`${siteUrl}/v1`);
     if (ok) {
       showSuccess(t('已复制到剪贴板'));
     } else {
@@ -226,11 +227,11 @@ const Home = () => {
                   <div className='home-access-card home-access-card-endpoint'>
                     <div className='home-access-header'>API Endpoint</div>
                     <div className='home-access-placeholder'>
-                      内容兼容 OpenAI 格式，直接替换 Base URL 即可使用。
+                      内容兼容 OpenAI 格式，直接替换 Base URL 即可使用（包含 `/v1`）。
                     </div>
                     <div className='home-access-row'>
                       <div className='home-access-input'>
-                        <span className='home-access-url'>{siteUrl}</span>
+                        <span className='home-access-url'>{siteUrl}/v1</span>
                         <button
                           type='button'
                           className='home-access-copy'
@@ -649,159 +650,102 @@ codex`}</code></pre>
                             </div>
 
                             <Tabs
-                              type='button'
-                              activeKey={openClawOsTab}
-                              onChange={setOpenClawOsTab}
-                              className='home-guide-os-tabs'
+                              type='line'
+                              activeKey={openClawMethodTab}
+                              onChange={setOpenClawMethodTab}
+                              className='home-guide-tabs'
                             >
-                              <TabPane tab='Windows' itemKey='windows'>
+                              <TabPane tab='方法一（配置向导）' itemKey='method1'>
                                 <div className='home-guide-steps'>
                                   <div className='home-guide-step'>
                                     <div className='home-guide-step-title'>
-                                      第一步：获取 API Token
+                                      第一步：打开配置向导
                                     </div>
-                                    <ul className='home-guide-list'>
-                                      <li>访问 Zer0by 控制台</li>
-                                      <li>令牌管理创建密钥，选择对应模型分组</li>
-                                      <li>复制生成的 API Key</li>
-                                    </ul>
-                                  </div>
-
-                                  <div className='home-guide-step'>
-                                    <div className='home-guide-step-title'>
-                                      第二步：修改配置文件
-                                    </div>
-
                                     <div className='home-guide-step-subtitle'>
-                                      1. 确认配置目录存在 (PowerShell)：
+                                      在终端输入：
                                     </div>
                                     <div className='home-guide-code-block'>
                                       <button
                                         className='home-guide-code-copy'
-                                        onClick={() => handleCopyCode('mkdir $env:USERPROFILE\\.openclaw')}
+                                        onClick={() => handleCopyCode('openclaw config')}
                                       >
                                         复制
                                       </button>
-                                      <pre><code>{`mkdir $env:USERPROFILE\\.openclaw`}</code></pre>
-                                    </div>
-
-                                    <div className='home-guide-step-subtitle'>
-                                      2. 打开 `%USERPROFILE%\\.openclaw\\openclaw.json`，在文件底部追加：
-                                    </div>
-                                    <div className='home-guide-code-block'>
-                                      <button
-                                        className='home-guide-code-copy'
-                                        onClick={() => handleCopyCode(`{
-  "models": {
-    "mode": "merge",
-    "providers": {
-      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
-      "zeroby": {
-        "baseUrl": "${siteUrl}/v1",
-        "apiKey": "粘贴你的 API Key",
-        "api": "openai-completions",
-        // 模型名称与 ID 保持一致，名称可在模型广场查看
-        "models": [
-          { "id": "gpt-5.4", "name": "GPT-5.4" },
-          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
-        ]
-      }
-    }
-  },
-  "agents": {
-    "defaults": {
-      // 改成默认使用的模型别名
-      "models": {
-        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
-      },
-      // 改成默认使用的主模型
-      "model": { "primary": "zeroby/gpt-5.4" }
-    }
-  }
-}`)}
-                                      >
-                                        复制
-                                      </button>
-                                      <pre><code>{`{
-  "models": {
-    "mode": "merge",
-    "providers": {
-      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
-      "zeroby": {
-        "baseUrl": "${siteUrl}/v1",
-        "apiKey": "粘贴你的 API Key",
-        "api": "openai-completions",
-        // 模型名称与 ID 保持一致，名称可在模型广场查看
-        "models": [
-          { "id": "gpt-5.4", "name": "GPT-5.4" },
-          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
-        ]
-      }
-    }
-  },
-  "agents": {
-    "defaults": {
-      // 改成默认使用的模型别名
-      "models": {
-        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
-      },
-      // 改成默认使用的主模型
-      "model": { "primary": "zeroby/gpt-5.4" }
-    }
-  }
-}`}</code></pre>
+                                      <pre><code>{`openclaw config`}</code></pre>
                                     </div>
                                   </div>
 
                                   <div className='home-guide-step'>
                                     <div className='home-guide-step-title'>
-                                      第三步：启动使用
+                                      第二步：填写模型接入信息
                                     </div>
                                     <div className='home-guide-step-desc'>
-                                      保存配置后重新启动 OpenClaw，即可使用
-                                      `gpt-5.4` 作为默认模型。
+                                      在配置向导中进入 Model 设置，仅需配置 Model。
+                                    </div>
+                                    <div className='home-guide-step-desc'>
+                                      Provider 选择倒数第二项 `Custom Provider`。
+                                    </div>
+                                    <div className='home-guide-step-desc'>
+                                      按以下字段填写：
+                                    </div>
+                                    <ul className='home-guide-list'>
+                                      <li>`API Base URL`：`https://ai.1seey.com/v1`</li>
+                                      <li>`API Key`：选择粘贴 Key，填入令牌管理生成的 Key</li>
+                                      <li>`Endpoint Compatibility`：选择 `OpenAI-compatible`</li>
+                                      <li>`Model Name`：填写模型广场的完整模型名称（不要省略）</li>
+                                      <li>`Model Alias (optional)`：可不填</li>
+                                    </ul>
+                                    <div className='home-guide-step-desc'>
+                                      选择 `Continue` 完成配置。
                                     </div>
                                   </div>
                                 </div>
                               </TabPane>
-                              <TabPane tab='macOS' itemKey='macos'>
-                                <div className='home-guide-steps'>
-                                  <div className='home-guide-step'>
-                                    <div className='home-guide-step-title'>
-                                      第一步：获取 API Token
-                                    </div>
-                                    <ul className='home-guide-list'>
-                                      <li>访问 Zer0by 控制台</li>
-                                      <li>令牌管理创建密钥，选择对应模型分组</li>
-                                      <li>复制生成的 API Key</li>
-                                    </ul>
-                                  </div>
+                              <TabPane tab='方法二（手动配置）' itemKey='method2'>
+                                <Tabs
+                                  type='button'
+                                  activeKey={openClawOsTab}
+                                  onChange={setOpenClawOsTab}
+                                  className='home-guide-os-tabs'
+                                >
+                                  <TabPane tab='Windows' itemKey='windows'>
+                                    <div className='home-guide-steps'>
+                                      <div className='home-guide-step'>
+                                        <div className='home-guide-step-title'>
+                                          第一步：获取 API Token
+                                        </div>
+                                        <ul className='home-guide-list'>
+                                          <li>访问 Zer0by 控制台</li>
+                                          <li>令牌管理创建密钥，选择对应模型分组</li>
+                                          <li>复制生成的 API Key</li>
+                                        </ul>
+                                      </div>
 
-                                  <div className='home-guide-step'>
-                                    <div className='home-guide-step-title'>
-                                      第二步：修改配置文件
-                                    </div>
+                                      <div className='home-guide-step'>
+                                        <div className='home-guide-step-title'>
+                                          第二步：修改配置文件
+                                        </div>
 
-                                    <div className='home-guide-step-subtitle'>
-                                      1. 确认配置目录存在 (Terminal)：
-                                    </div>
-                                    <div className='home-guide-code-block'>
-                                      <button
-                                        className='home-guide-code-copy'
-                                        onClick={() => handleCopyCode('mkdir -p ~/.openclaw')}
-                                      >
-                                        复制
-                                      </button>
-                                      <pre><code>{`mkdir -p ~/.openclaw`}</code></pre>
-                                    </div>
+                                        <div className='home-guide-step-subtitle'>
+                                          1. 确认配置目录存在 (PowerShell)：
+                                        </div>
+                                        <div className='home-guide-code-block'>
+                                          <button
+                                            className='home-guide-code-copy'
+                                            onClick={() => handleCopyCode('mkdir $env:USERPROFILE\\.openclaw')}
+                                          >
+                                            复制
+                                          </button>
+                                          <pre><code>{`mkdir $env:USERPROFILE\\.openclaw`}</code></pre>
+                                        </div>
 
-                                    <div className='home-guide-step-subtitle'>
-                                      2. 打开 `~/.openclaw/openclaw.json`，在文件底部追加：
-                                    </div>
-                                    <div className='home-guide-code-block'>
-                                      <button
-                                        className='home-guide-code-copy'
-                                        onClick={() => handleCopyCode(`{
+                                        <div className='home-guide-step-subtitle'>
+                                          2. 打开 `%USERPROFILE%\.openclaw\openclaw.json`，在文件底部追加：
+                                        </div>
+                                        <div className='home-guide-code-block'>
+                                          <button
+                                            className='home-guide-code-copy'
+                                            onClick={() => handleCopyCode(`{
   "models": {
     "mode": "merge",
     "providers": {
@@ -829,10 +773,10 @@ codex`}</code></pre>
     }
   }
 }`)}
-                                      >
-                                        复制
-                                      </button>
-                                      <pre><code>{`{
+                                          >
+                                            复制
+                                          </button>
+                                          <pre><code>{`{
   "models": {
     "mode": "merge",
     "providers": {
@@ -860,80 +804,58 @@ codex`}</code></pre>
     }
   }
 }`}</code></pre>
-                                    </div>
-                                  </div>
+                                        </div>
+                                      </div>
 
-                                  <div className='home-guide-step'>
-                                    <div className='home-guide-step-title'>
-                                      第三步：启动使用
+                                      <div className='home-guide-step'>
+                                        <div className='home-guide-step-title'>
+                                          第三步：启动使用
+                                        </div>
+                                        <div className='home-guide-step-desc'>
+                                          保存配置后重新启动 OpenClaw，即可使用
+                                          `gpt-5.4` 作为默认模型。
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className='home-guide-step-desc'>
-                                      保存配置后重新启动 OpenClaw，即可使用
-                                      `gpt-5.4` 作为默认模型。
-                                    </div>
-                                  </div>
-                                </div>
-                              </TabPane>
-                              <TabPane tab='Linux (WSL)' itemKey='linux'>
-                                <div className='home-guide-steps'>
-                                  <div className='home-guide-step'>
-                                    <div className='home-guide-step-title'>
-                                      第一步：获取 API Token
-                                    </div>
-                                    <ul className='home-guide-list'>
-                                      <li>访问 Zer0by 控制台</li>
-                                      <li>令牌管理创建密钥，选择对应模型分组</li>
-                                      <li>复制生成的 API Key</li>
-                                    </ul>
-                                  </div>
+                                  </TabPane>
+                                  <TabPane tab='macOS' itemKey='macos'>
+                                    <div className='home-guide-steps'>
+                                      <div className='home-guide-step'>
+                                        <div className='home-guide-step-title'>
+                                          第一步：获取 API Token
+                                        </div>
+                                        <ul className='home-guide-list'>
+                                          <li>访问 Zer0by 控制台</li>
+                                          <li>令牌管理创建密钥，选择对应模型分组</li>
+                                          <li>复制生成的 API Key</li>
+                                        </ul>
+                                      </div>
 
-                                  <div className='home-guide-step'>
-                                    <div className='home-guide-step-title'>
-                                      第二步（方法一）：一键添加自定义模型（推荐）
-                                    </div>
-                                    <div className='home-guide-step-subtitle'>
-                                      1. 使用脚本快速写入 OpenClaw 配置：
-                                    </div>
-                                    <div className='home-guide-code-block'>
-                                      <button
-                                        className='home-guide-code-copy'
-                                        onClick={() =>
-                                          handleCopyCode(
-                                            'bash <(curl -sL kejilion.sh) app openclaw',
-                                          )
-                                        }
-                                      >
-                                        复制
-                                      </button>
-                                      <pre><code>{`bash <(curl -sL kejilion.sh) app openclaw`}</code></pre>
-                                    </div>
-                                  </div>
+                                      <div className='home-guide-step'>
+                                        <div className='home-guide-step-title'>
+                                          第二步：修改配置文件
+                                        </div>
 
-                                  <div className='home-guide-step'>
-                                    <div className='home-guide-step-title'>
-                                      第二步（方法二）：手动修改配置文件
-                                    </div>
+                                        <div className='home-guide-step-subtitle'>
+                                          1. 确认配置目录存在 (Terminal)：
+                                        </div>
+                                        <div className='home-guide-code-block'>
+                                          <button
+                                            className='home-guide-code-copy'
+                                            onClick={() => handleCopyCode('mkdir -p ~/.openclaw')}
+                                          >
+                                            复制
+                                          </button>
+                                          <pre><code>{`mkdir -p ~/.openclaw`}</code></pre>
+                                        </div>
 
-                                    <div className='home-guide-step-subtitle'>
-                                      1. 确认配置目录存在 (Terminal)：
-                                    </div>
-                                    <div className='home-guide-code-block'>
-                                      <button
-                                        className='home-guide-code-copy'
-                                        onClick={() => handleCopyCode('mkdir -p ~/.openclaw')}
-                                      >
-                                        复制
-                                      </button>
-                                      <pre><code>{`mkdir -p ~/.openclaw`}</code></pre>
-                                    </div>
-
-                                    <div className='home-guide-step-subtitle'>
-                                      2. 打开 `~/.openclaw/openclaw.json`，在文件底部追加：
-                                    </div>
-                                    <div className='home-guide-code-block'>
-                                      <button
-                                        className='home-guide-code-copy'
-                                        onClick={() => handleCopyCode(`{
+                                        <div className='home-guide-step-subtitle'>
+                                          2. 打开 `~/.openclaw/openclaw.json`，在文件底部追加：
+                                        </div>
+                                        <div className='home-guide-code-block'>
+                                          <button
+                                            className='home-guide-code-copy'
+                                            onClick={() => handleCopyCode(`{
   "models": {
     "mode": "merge",
     "providers": {
@@ -961,10 +883,10 @@ codex`}</code></pre>
     }
   }
 }`)}
-                                      >
-                                        复制
-                                      </button>
-                                      <pre><code>{`{
+                                          >
+                                            复制
+                                          </button>
+                                          <pre><code>{`{
   "models": {
     "mode": "merge",
     "providers": {
@@ -992,19 +914,131 @@ codex`}</code></pre>
     }
   }
 }`}</code></pre>
-                                    </div>
-                                  </div>
+                                        </div>
+                                      </div>
 
-                                  <div className='home-guide-step'>
-                                    <div className='home-guide-step-title'>
-                                      第三步：启动使用
+                                      <div className='home-guide-step'>
+                                        <div className='home-guide-step-title'>
+                                          第三步：启动使用
+                                        </div>
+                                        <div className='home-guide-step-desc'>
+                                          保存配置后重新启动 OpenClaw，即可使用
+                                          `gpt-5.4` 作为默认模型。
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className='home-guide-step-desc'>
-                                      保存配置后重新启动 OpenClaw，即可使用
-                                      `gpt-5.4` 作为默认模型。
+                                  </TabPane>
+                                  <TabPane tab='Linux (WSL)' itemKey='linux'>
+                                    <div className='home-guide-steps'>
+                                      <div className='home-guide-step'>
+                                        <div className='home-guide-step-title'>
+                                          第一步：获取 API Token
+                                        </div>
+                                        <ul className='home-guide-list'>
+                                          <li>访问 Zer0by 控制台</li>
+                                          <li>令牌管理创建密钥，选择对应模型分组</li>
+                                          <li>复制生成的 API Key</li>
+                                        </ul>
+                                      </div>
+
+                                      <div className='home-guide-step'>
+                                        <div className='home-guide-step-title'>
+                                          第二步：修改配置文件
+                                        </div>
+
+                                        <div className='home-guide-step-subtitle'>
+                                          1. 确认配置目录存在 (Terminal)：
+                                        </div>
+                                        <div className='home-guide-code-block'>
+                                          <button
+                                            className='home-guide-code-copy'
+                                            onClick={() => handleCopyCode('mkdir -p ~/.openclaw')}
+                                          >
+                                            复制
+                                          </button>
+                                          <pre><code>{`mkdir -p ~/.openclaw`}</code></pre>
+                                        </div>
+
+                                        <div className='home-guide-step-subtitle'>
+                                          2. 打开 `~/.openclaw/openclaw.json`，在文件底部追加：
+                                        </div>
+                                        <div className='home-guide-code-block'>
+                                          <button
+                                            className='home-guide-code-copy'
+                                            onClick={() => handleCopyCode(`{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
+      "zeroby": {
+        "baseUrl": "${siteUrl}/v1",
+        "apiKey": "粘贴你的 API Key",
+        "api": "openai-completions",
+        // 模型名称与 ID 保持一致，名称可在模型广场查看
+        "models": [
+          { "id": "gpt-5.4", "name": "GPT-5.4" },
+          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      // 改成默认使用的模型别名
+      "models": {
+        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
+      },
+      // 改成默认使用的主模型
+      "model": { "primary": "zeroby/gpt-5.4" }
+    }
+  }
+}`)}
+                                          >
+                                            复制
+                                          </button>
+                                          <pre><code>{`{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      // zeroby 为模型提供商名称，需与下方 agent 模型提供商名称保持一致
+      "zeroby": {
+        "baseUrl": "${siteUrl}/v1",
+        "apiKey": "粘贴你的 API Key",
+        "api": "openai-completions",
+        // 模型名称与 ID 保持一致，名称可在模型广场查看
+        "models": [
+          { "id": "gpt-5.4", "name": "GPT-5.4" },
+          { "id": "gpt-5.1-codex", "name": "GPT-5.1 Codex" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      // 改成默认使用的模型别名
+      "models": {
+        "zeroby/gpt-5.4": { "alias": "gpt-5.4" }
+      },
+      // 改成默认使用的主模型
+      "model": { "primary": "zeroby/gpt-5.4" }
+    }
+  }
+}`}</code></pre>
+                                        </div>
+                                      </div>
+
+                                      <div className='home-guide-step'>
+                                        <div className='home-guide-step-title'>
+                                          第三步：启动使用
+                                        </div>
+                                        <div className='home-guide-step-desc'>
+                                          保存配置后重新启动 OpenClaw，即可使用
+                                          `gpt-5.4` 作为默认模型。
+                                        </div>
+                                      </div>
                                     </div>
-                                  </div>
-                                </div>
+                                  </TabPane>
+                                </Tabs>
                               </TabPane>
                             </Tabs>
                           </div>
